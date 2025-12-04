@@ -419,18 +419,6 @@ Open that in your browser.
 ![Logs](docs/screenshot/logs.png)
 
 
-Example section:
-
-```markdown
-## 📸 Screenshots
-
-### Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
-
-### Template Deployment
-![Template Mode](docs/screenshots/template-mode.png)
-```
-
 ---
 
 ## 🧑‍💻 Author
@@ -452,6 +440,7 @@ See the [LICENSE](LICENSE) file for details.
 
 ::contentReference[oaicite:0]{index=0}
 ```
+
 
 
 
