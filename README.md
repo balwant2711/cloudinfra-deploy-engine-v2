@@ -1,5 +1,5 @@
-## 📄 README.md (paste this into your repo)
-
+<p align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" width="80"/> <br> <b>CloudInfra Deploy Engine v2</b> <br> <i>A Web-Based Terraform Deployment Platform for AWS</i> </p> <p align="center"> <img src="https://img.shields.io/badge/Terraform-Automation-623CE4?style=for-the-badge&logo=terraform&logoColor=white"/> <img src="https://img.shields.io/badge/AWS-Cloud-orange?style=for-the-badge&logo=amazonaws&logoColor=white"/> <img src="https://img.shields.io/badge/Python-Flask-blue?style=for-the-badge&logo=python&logoColor=white"/> <img src="https://img.shields.io/badge/Version-2.0-success?style=for-the-badge"/> </p>
 
 # ☁️ CloudInfra Deploy Engine v2  
 ### A Web-Based Terraform Deployment Platform for AWS
@@ -24,7 +24,7 @@ With this platform, you can:
 
 ## 🔥 Core Features
 
-### 1. Secure Login & Dashboard
+### 🔐 1. Secure Login & Dashboard
 
 - Simple Flask-based login with session handling
 - Authenticated dashboard per user
@@ -40,45 +40,45 @@ With this platform, you can:
 
 ---
 
-### 2. Template Mode – One-Click Standard Infrastructures
+### 🧩 2. Template Mode – One-Click Standard Infrastructures
 
 Choose from pre-built, battle-tested Terraform templates and fill a simple form.
 
 Currently supported templates:
 
-1. **Web Server – Single EC2 Instance (`web_server`)**
+1. 🟢 **Web Server – Single EC2 Instance (`web_server`)**
    - Launches one EC2 instance
    - Installs a web server (Apache)
    - Returns public IP + DNS
 
-2. **VPC – Public/Private Subnets (`vpc_basic`)**
+2. 🌐 **VPC – Public/Private Subnets (`vpc_basic`)**
    - Creates a basic VPC
    - Public + private subnets across AZs
    - Good starting point for multi-tier architectures
 
-3. **Static Website – S3 + CloudFront (`s3_cloudfront`)**
+3. 🧊 **Static Website – S3 + CloudFront (`s3_cloudfront`)**
    - S3 bucket for static hosting
    - CloudFront distribution in front
    - Ideal for portfolio / landing pages
 
-4. **Two-Tier App – EC2 + RDS (`two_tier_app`)**
+4. 🏗️ **Two-Tier App – EC2 + RDS (`two_tier_app`)**
    - Web layer: EC2 instance
    - DB layer: MySQL RDS instance
    - Outputs include web DNS/IP & DB endpoint
 
-5. **EKS Cluster – Basic Managed Node Group (`eks_basic`)**
+5. ☸️ **EKS Cluster – Basic Managed Node Group (`eks_basic`)**
    - Creates a minimal EKS cluster
    - Managed node group using default VPC subnets
    - Good for learning Kubernetes on AWS  
    > Note: EKS creation can take several minutes.
 
-6. **ALB + ASG – Highly Available Web App (`alb_asg`)**
+6. ⚖️ **ALB + ASG – Highly Available Web App (`alb_asg`)**
    - Application Load Balancer (public)
    - Auto Scaling Group of EC2 instances behind ALB
    - User data installs and serves a simple web page
    - Shows instance ID & AZ to visualize load balancing
 
-7. **Secure Web Hosting – GitHub-powered Nginx (`secure_web_hosting`)**
+7. 🔒 **Secure Web Hosting – GitHub-powered Nginx (`secure_web_hosting`)**
    - Hardened EC2 server with:
      - SSH restricted by CIDR
      - Password authentication disabled (key-only)
@@ -91,7 +91,7 @@ Each template has its **own parameter section** that auto-appears when selected 
 
 ---
 
-### 3. Custom Mode – Any Terraform Project via ZIP
+### 📦 3. Custom Mode – Any Terraform Project via ZIP
 
 For advanced users:
 
@@ -106,7 +106,7 @@ This essentially converts your browser into a **generic Terraform runner**.
 
 ---
 
-### 4. Live Log Streaming
+### 📡 4. Live Log Streaming
 
 - Each job has a **Logs** page
 - Looks like a “terminal window” in the browser
@@ -117,7 +117,7 @@ This essentially converts your browser into a **generic Terraform runner**.
 
 ---
 
-### 5. Outputs Viewer
+### 📤 5. Outputs Viewer
 
 - After a successful run, all Terraform `outputs` are stored
 - Dedicated **Outputs** page:
@@ -132,7 +132,7 @@ This essentially converts your browser into a **generic Terraform runner**.
 
 ---
 
-### 6. Destroy Infrastructure from UI
+### 🧨 6. Destroy Infrastructure from UI
 
 From the Dashboard:
 
@@ -399,15 +399,24 @@ Open that in your browser.
 
 ---
 
-## 📸 Screenshots (TODO)
+## 📸 Screenshots 
 
-You can add screenshots here after capturing them:
+## 📸 UI Previews
 
-* `docs/screenshots/dashboard.png`
-* `docs/screenshots/template-mode.png`
-* `docs/screenshots/custom-mode.png`
-* `docs/screenshots/logs.png`
-* `docs/screenshots/outputs.png`
+### 🏠 Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+
+### 📋 Template Deployment
+![Template Mode](docs/screenshots/template.png)
+
+### 🗂️ Custom ZIP Deployment
+![Custom](docs/screenshots/custom.png)
+
+### 🖥️ Live Logs
+![Logs](docs/screenshots/logs.png)
+
+### 📤 Outputs Viewer
+![Outputs](docs/screenshots/outputs.png)
 
 Example section:
 
@@ -442,3 +451,4 @@ See the [LICENSE](LICENSE) file for details.
 
 ::contentReference[oaicite:0]{index=0}
 ```
+
