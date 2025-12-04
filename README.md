@@ -403,6 +403,9 @@ Open that in your browser.
 
 ## 📸 UI Previews
 
+### 📤 Login Page
+![Login](docs/screenshots/login.png)
+
 ### 🏠 Dashboard
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -415,8 +418,6 @@ Open that in your browser.
 ### 🖥️ Live Logs
 ![Logs](docs/screenshots/logs.png)
 
-### 📤 Outputs Viewer
-![Outputs](docs/screenshots/outputs.png)
 
 Example section:
 
@@ -451,4 +452,5 @@ See the [LICENSE](LICENSE) file for details.
 
 ::contentReference[oaicite:0]{index=0}
 ```
+
 
