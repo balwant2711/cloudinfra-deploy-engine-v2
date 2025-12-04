@@ -1,0 +1,591 @@
+{% extends "base.html" %} {% block header_title %} Template Deployments {%
+endblock %} {% block content %}
+<div class="max-w-4xl mx-auto space-y-5">
+  <h1 class="section-title">Template-based Infrastructure</h1>
+  <p class="text-sm text-slate-400 mb-2">
+    Launch opinionated AWS architectures using pre-built Terraform templates –
+    from single EC2 web servers to EKS clusters and ALB-backed auto-scaling
+    apps.
+  </p>
+
+  <div class="card-glow">
+    <form method="POST" class="space-y-5">
+      <!-- Template Selection -->
+      <div>
+        <label class="block text-sm mb-1 font-medium">Template</label>
+        <select id="template-select" name="template_id" class="w-full" required>
+          <option value="">-- Select Template --</option>
+          {% for t in templates %}
+          <option value="{{ t.id }}">{{ t.label }}</option>
+          {% endfor %}
+        </select>
+        <p class="text-xs text-slate-500 mt-1">
+          Different templates expose different input sections below.
+        </p>
+      </div>
+
+      <!-- AWS Region -->
+      <div>
+        <label class="block text-sm mb-1 font-medium">AWS Region</label>
+        <input
+          type="text"
+          name="aws_region"
+          placeholder="ap-south-1"
+          value="ap-south-1"
+          class="w-full"
+        />
+      </div>
+
+      <!-- SECTION: Web Server -->
+      <div
+        id="section-web_server"
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/70 space-y-3 hidden"
+      >
+        <p class="text-sm font-medium">Web Server Template Parameters</p>
+        <p class="text-xs text-slate-500">
+          Template: <span class="font-mono">web_server</span> – Launches a
+          single EC2 instance with Apache.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1 font-medium">Instance Name</label>
+            <input
+              type="text"
+              name="instance_name"
+              placeholder="my-web-server"
+              class="w-full"
+            />
+          </div>
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >AWS Key Pair Name</label
+            >
+            <input
+              type="text"
+              name="key_pair_name"
+              placeholder="my-ec2-keypair"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: VPC Basic -->
+      <div
+        id="section-vpc_basic"
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/70 space-y-3 hidden"
+      >
+        <p class="text-sm font-medium">VPC Template Parameters</p>
+        <p class="text-xs text-slate-500">
+          Template: <span class="font-mono">vpc_basic</span> – Creates a VPC
+          with public &amp; private subnets. All CIDRs are required.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1 font-medium">VPC CIDR</label>
+            <input
+              type="text"
+              name="vpc_cidr"
+              placeholder="10.0.0.0/16"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Public Subnet 1 CIDR</label
+            >
+            <input
+              type="text"
+              name="public_subnet_1_cidr"
+              placeholder="10.0.1.0/24"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Public Subnet 2 CIDR</label
+            >
+            <input
+              type="text"
+              name="public_subnet_2_cidr"
+              placeholder="10.0.2.0/24"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Private Subnet 1 CIDR</label
+            >
+            <input
+              type="text"
+              name="private_subnet_1_cidr"
+              placeholder="10.0.11.0/24"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Private Subnet 2 CIDR</label
+            >
+            <input
+              type="text"
+              name="private_subnet_2_cidr"
+              placeholder="10.0.12.0/24"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: S3 + CloudFront -->
+      <div
+        id="section-s3_cloudfront"
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/70 space-y-3 hidden"
+      >
+        <p class="text-sm font-medium">S3 + CloudFront Template Parameters</p>
+        <p class="text-xs text-slate-500">
+          Template: <span class="font-mono">s3_cloudfront</span> – Creates a
+          public static website. Bucket name must be globally unique.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1 font-medium">S3 Bucket Name</label>
+            <input
+              type="text"
+              name="s3_bucket_name"
+              placeholder="my-unique-bucket-name-123"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Two-Tier App (EC2 + RDS) -->
+      <div
+        id="section-two_tier_app"
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/70 space-y-3 hidden"
+      >
+        <p class="text-sm font-medium">Two-Tier App Parameters</p>
+        <p class="text-xs text-slate-500">
+          Template: <span class="font-mono">two_tier_app</span> – Deploys a web
+          EC2 instance and a MySQL RDS database.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1 font-medium">Instance Name</label>
+            <input
+              type="text"
+              name="instance_name"
+              placeholder="two-tier-web"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >AWS Key Pair Name</label
+            >
+            <input
+              type="text"
+              name="key_pair_name"
+              placeholder="my-ec2-keypair"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">DB Name</label>
+            <input
+              type="text"
+              name="db_name"
+              placeholder="appdb"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">DB Username</label>
+            <input
+              type="text"
+              name="db_username"
+              placeholder="admin"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">DB Password</label>
+            <input
+              type="password"
+              name="db_password"
+              placeholder="StrongPassword123!"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: EKS Basic Cluster -->
+      <div
+        id="section-eks_basic"
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/70 space-y-3 hidden"
+      >
+        <p class="text-sm font-medium">EKS Basic Cluster Parameters</p>
+        <p class="text-xs text-slate-500">
+          Template: <span class="font-mono">eks_basic</span> – Creates an EKS
+          cluster with a managed node group using the default VPC subnets. Note:
+          This can take several minutes to complete.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1 font-medium">Cluster Name</label>
+            <input
+              type="text"
+              name="eks_cluster_name"
+              placeholder="my-eks-cluster"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Node Instance Type</label
+            >
+            <input
+              type="text"
+              name="eks_node_instance_type"
+              placeholder="t3.small"
+              value="t3.small"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Desired Node Count</label
+            >
+            <input
+              type="number"
+              name="eks_desired_size"
+              placeholder="2"
+              value="2"
+              min="1"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Min Node Count</label>
+            <input
+              type="number"
+              name="eks_min_size"
+              placeholder="1"
+              value="1"
+              min="1"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Max Node Count</label>
+            <input
+              type="number"
+              name="eks_max_size"
+              placeholder="3"
+              value="3"
+              min="1"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: ALB + ASG App -->
+      <div
+        id="section-alb_asg"
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/70 space-y-3 hidden"
+      >
+        <p class="text-sm font-medium">ALB + ASG Web App Parameters</p>
+        <p class="text-xs text-slate-500">
+          Template: <span class="font-mono">alb_asg</span> – Deploys an
+          Application Load Balancer and an Auto Scaling Group of web instances
+          in the default VPC.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >App / Instance Name Prefix</label
+            >
+            <input
+              type="text"
+              name="instance_name"
+              placeholder="alb-asg-web"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >AWS Key Pair Name</label
+            >
+            <input
+              type="text"
+              name="key_pair_name"
+              placeholder="my-ec2-keypair"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Instance Type</label>
+            <input
+              type="text"
+              name="asg_instance_type"
+              placeholder="t2.micro"
+              value="t2.micro"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Desired Capacity</label
+            >
+            <input
+              type="number"
+              name="asg_desired_capacity"
+              placeholder="2"
+              value="2"
+              min="1"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Min Size</label>
+            <input
+              type="number"
+              name="asg_min_size"
+              placeholder="1"
+              value="1"
+              min="1"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Max Size</label>
+            <input
+              type="number"
+              name="asg_max_size"
+              placeholder="3"
+              value="3"
+              min="1"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Secure Web Hosting -->
+      <div
+        id="section-secure_web_hosting"
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/70 space-y-3 hidden"
+      >
+        <p class="text-sm font-medium">Secure Web Hosting Parameters</p>
+        <p class="text-xs text-slate-500">
+          Template: <span class="font-mono">secure_web_hosting</span> – Hardened
+          single EC2 web server that clones your app from GitHub and serves it
+          via Nginx.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1 font-medium">Instance Name</label>
+            <input
+              type="text"
+              name="instance_name"
+              placeholder="secure-web-server"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >AWS Key Pair Name</label
+            >
+            <input
+              type="text"
+              name="key_pair_name"
+              placeholder="my-ec2-keypair"
+              class="w-full"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm mb-1 font-medium"
+              >GitHub Repository URL</label
+            >
+            <input
+              type="text"
+              name="github_repo_url"
+              placeholder="https://github.com/username/repo.git"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Git Branch</label>
+            <input
+              type="text"
+              name="github_branch"
+              placeholder="main"
+              value="main"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Repo Web Root Subdirectory (optional)</label
+            >
+            <input
+              type="text"
+              name="app_root_subdir"
+              placeholder="dist or build (if any)"
+              class="w-full"
+            />
+            <p class="text-[11px] text-slate-500 mt-1">
+              Leave empty if <code>index.html</code> is in the repo root.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Domain Name</label>
+            <input
+              type="text"
+              name="domain_name"
+              placeholder="example.com"
+              class="w-full"
+            />
+            <p class="text-[11px] text-slate-500 mt-1">
+              Used in nginx <code>server_name</code>. Even if DNS not yet
+              mapped, app will run on public IP/DNS.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium"
+              >Allowed SSH CIDR</label
+            >
+            <input
+              type="text"
+              name="allowed_ssh_cidr"
+              placeholder="YOUR_IP/32 (e.g. 49.x.x.x/32)"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1 font-medium">Instance Type</label>
+            <input
+              type="text"
+              name="secure_instance_type"
+              placeholder="t3.micro"
+              value="t3.micro"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- AWS Credentials -->
+      <div
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/80 space-y-3"
+      >
+        <p class="text-sm font-medium">AWS Credentials</p>
+        <p class="text-xs text-slate-500">
+          Used only for this execution via environment variables. They are
+          <span class="font-semibold">not stored</span> in the database.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1 font-medium"
+              >AWS Access Key ID</label
+            >
+            <input
+              type="password"
+              name="aws_access_key"
+              required
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs mb-1 font-medium"
+              >AWS Secret Access Key</label
+            >
+            <input
+              type="password"
+              name="aws_secret_key"
+              required
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <p class="text-xs text-slate-500">
+          On submit, Terraform <code>init</code> and <code>apply</code> run in
+          the background. You can follow progress from the Dashboard &amp; Logs.
+        </p>
+        <button type="submit" class="btn-primary flex items-center gap-1">
+          <span>🚀</span>
+          <span>Deploy Template</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const templateSelect = document.getElementById("template-select");
+
+  const sections = {
+    web_server: document.getElementById("section-web_server"),
+    vpc_basic: document.getElementById("section-vpc_basic"),
+    s3_cloudfront: document.getElementById("section-s3_cloudfront"),
+    two_tier_app: document.getElementById("section-two_tier_app"),
+    eks_basic: document.getElementById("section-eks_basic"),
+    alb_asg: document.getElementById("section-alb_asg"),
+    secure_web_hosting: document.getElementById("section-secure_web_hosting"),
+  };
+
+  function updateTemplateSections() {
+    const value = templateSelect.value;
+
+    Object.values(sections).forEach((sec) => {
+      if (sec) sec.classList.add("hidden");
+    });
+
+    if (sections[value]) {
+      sections[value].classList.remove("hidden");
+    }
+  }
+
+  templateSelect.addEventListener("change", updateTemplateSections);
+
+  window.addEventListener("DOMContentLoaded", () => {
+    updateTemplateSections();
+  });
+</script>
+{% endblock %}

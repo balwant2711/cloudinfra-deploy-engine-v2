@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CloudInfra Deploy Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+
+    <!-- Favicon optional -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https://www.svgrepo.com/show/530439/cloud-computing-1.svg"
+    />
+  </head>
+  <body class="h-full min-h-screen">
+    <div class="min-h-screen flex text-slate-100">
+      {# Sidebar #}
+      <aside
+        class="hidden md:flex md:flex-col w-64 border-r border-slate-800 bg-slate-950/80 backdrop-blur-xl"
+      >
+        <div
+          class="px-5 py-4 border-b border-slate-800 flex items-center gap-3"
+        >
+          <div
+            class="h-9 w-9 rounded-xl bg-sky-500/10 flex items-center justify-center"
+          >
+            <!-- Small icon -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-sky-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+            >
+              <path d="M7.5 7.5h9v9h-9z" />
+              <path
+                d="M4 4h16v16H4z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div>
+            <div class="text-sm font-semibold tracking-wide">
+              CloudInfra Deploy Engine
+            </div>
+            <div class="text-[11px] text-slate-500">
+              Terraform as a Web Platform
+            </div>
+          </div>
+        </div>
+
+        {% set current = request.endpoint %}
+        <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+          <a
+            href="{{ url_for('dashboard') }}"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg {% if current == 'dashboard' %}bg-sky-500/20 text-sky-300{% else %}hover:bg-slate-800/70{% endif %}"
+          >
+            <span class="text-[16px]">📊</span>
+            <span>Dashboard</span>
+          </a>
+
+          <a
+            href="{{ url_for('deploy_template') }}"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg {% if current == 'deploy_template' %}bg-sky-500/20 text-sky-300{% else %}hover:bg-slate-800/70{% endif %}"
+          >
+            <span class="text-[16px]">🧩</span>
+            <span>Template Deployments</span>
+          </a>
+
+          <a
+            href="{{ url_for('deploy_custom') }}"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg {% if current == 'deploy_custom' %}bg-sky-500/20 text-sky-300{% else %}hover:bg-slate-800/70{% endif %}"
+          >
+            <span class="text-[16px]">📦</span>
+            <span>Custom Terraform ZIP</span>
+          </a>
+        </nav>
+
+        <div class="border-t border-slate-800 px-4 py-3 text-xs text-slate-500">
+          <div class="flex items-center justify-between mb-1">
+            <span>Logged in as</span>
+            <span
+              class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300"
+            >
+              user#{{ session.get("user_id") }}
+            </span>
+          </div>
+          <a
+            href="{{ url_for('logout') }}"
+            class="inline-flex items-center gap-1 text-red-400 hover:text-red-300 mt-1"
+          >
+            <span>Logout</span> <span>↗</span>
+          </a>
+        </div>
+      </aside>
+
+      {# Main content area #}
+      <div class="flex-1 flex flex-col">
+        <!-- Topbar (mobile + stats) -->
+        <header
+          class="border-b border-slate-800 bg-slate-950/60 backdrop-blur-xl px-4 md:px-6 py-3 flex items-center justify-between gap-3"
+        >
+          <div class="flex items-center gap-3">
+            <div class="md:hidden">
+              <div
+                class="h-9 w-9 rounded-xl bg-sky-500/10 flex items-center justify-center"
+              >
+                <span class="text-sky-400 text-xl">☁️</span>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-500">
+                Control Panel
+              </div>
+              <div class="text-sm font-semibold text-slate-100">
+                {% block header_title %}{% endblock %}
+              </div>
+            </div>
+          </div>
+          <div
+            class="hidden md:flex items-center gap-2 text-[11px] text-slate-400"
+          >
+            <div
+              class="px-2 py-1 rounded-full bg-slate-900 border border-slate-700/60"
+            >
+              Terraform Web Runner
+            </div>
+            <div
+              class="px-2 py-1 rounded-full bg-slate-900 border border-slate-700/60"
+            >
+              AWS | Templates &amp; Custom
+            </div>
+          </div>
+        </header>
+
+        <!-- Flash messages -->
+        <div class="px-4 md:px-6 pt-3">
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %}
+          <div class="space-y-2">
+            {% for category, message in messages %} {% set color =
+            'bg-sky-900/60 text-sky-100 border-sky-700/70' if category == 'info'
+            else 'bg-emerald-900/60 text-emerald-100 border-emerald-700/70' if
+            category == 'success' else 'bg-yellow-900/60 text-yellow-100
+            border-yellow-700/70' if category == 'warning' else 'bg-red-900/60
+            text-red-100 border-red-700/70' %}
+            <div class="text-xs px-3 py-2 rounded-xl border {{ color }}">
+              {{ message }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %} {% endwith %}
+        </div>
+
+        <!-- Page content -->
+        <main class="flex-1 px-4 md:px-6 py-4 md:py-6">
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

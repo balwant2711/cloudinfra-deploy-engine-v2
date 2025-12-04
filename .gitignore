@@ -1,0 +1,19 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+
+# Runtime / generated
+custom_jobs/
+logs/
+*.log
+
+# Secrets
+.env

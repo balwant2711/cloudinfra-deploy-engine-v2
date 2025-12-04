@@ -1,0 +1,86 @@
+{% extends "base.html" %} {% block header_title %} Custom Terraform ZIP {%
+endblock %} {% block content %}
+<div class="max-w-3xl mx-auto space-y-5">
+  <h1 class="section-title">Custom Terraform Project</h1>
+  <p class="text-sm text-slate-400 mb-2">
+    Upload your own Terraform project as a <code>.zip</code> file, provide AWS
+    credentials, and the platform will execute <code>terraform init</code> +
+    <code>apply</code> in an isolated workspace.
+  </p>
+
+  <div class="card-glow">
+    <form method="POST" enctype="multipart/form-data" class="space-y-5">
+      <div>
+        <label class="block text-sm mb-1 font-medium">Terraform ZIP</label>
+        <input
+          type="file"
+          name="tf_zip"
+          accept=".zip"
+          class="w-full"
+          required
+        />
+        <p class="text-xs text-slate-500 mt-1">
+          The ZIP should contain your <code>.tf</code> files at the root or
+          inside a single folder.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1 font-medium">AWS Region</label>
+        <input
+          type="text"
+          name="aws_region"
+          placeholder="ap-south-1"
+          value="ap-south-1"
+          class="w-full"
+        />
+      </div>
+
+      <div
+        class="border border-slate-800 rounded-xl p-4 bg-slate-950/80 space-y-3"
+      >
+        <p class="text-sm font-medium">AWS Credentials</p>
+        <p class="text-xs text-slate-500">
+          Used only for this run. Not stored in database.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs mb-1 font-medium"
+              >AWS Access Key ID</label
+            >
+            <input
+              type="password"
+              name="aws_access_key"
+              required
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs mb-1 font-medium"
+              >AWS Secret Access Key</label
+            >
+            <input
+              type="password"
+              name="aws_secret_key"
+              required
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <p class="text-xs text-slate-500">
+          Once started, you can track the job from the Dashboard and stream logs
+          in real-time.
+        </p>
+        <button type="submit" class="btn-primary flex items-center gap-1">
+          <span>📦</span>
+          <span>Run Custom Project</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

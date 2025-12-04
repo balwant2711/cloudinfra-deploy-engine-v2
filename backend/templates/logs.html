@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% block header_title %} Job #{{ job.id }} Logs {%
+endblock %} {% block content %}
+<div class="space-y-4 max-w-5xl mx-auto">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="section-title">Execution Logs</h1>
+      <p class="text-xs text-slate-400 mt-1">
+        Mode: <span class="font-mono">{{ job.mode }}</span> {% if
+        job.template_name %} • Template:
+        <span class="font-mono">{{ job.template_name }}</span>
+        {% endif %} • Status:
+        <span class="font-mono" id="job-status">{{ job.status }}</span>
+      </p>
+    </div>
+    <a
+      href="{{ url_for('dashboard') }}"
+      class="px-3 py-2 text-xs rounded-lg bg-slate-800 hover:bg-slate-700"
+    >
+      ← Back to Dashboard
+    </a>
+  </div>
+
+  <div
+    id="log-container"
+    class="bg-black/90 border border-slate-800 rounded-2xl p-4 text-xs font-mono overflow-x-auto max-h-[70vh] overflow-y-auto"
+  >
+    <pre id="log-content" class="whitespace-pre-wrap">{{ log_content }}</pre>
+  </div>
+
+  <p class="text-[11px] text-slate-500">
+    Logs auto-refresh every 2 seconds while the job is running. You can keep
+    this tab open like a CLI tail.
+  </p>
+</div>
+
+<script>
+  const jobId = {{ job.id }};
+  const logContentEl = document.getElementById("log-content");
+  const logContainerEl = document.getElementById("log-container");
+
+  let autoScroll = true;
+
+  logContainerEl.addEventListener("scroll", () => {
+      const nearBottom =
+          logContainerEl.scrollTop + logContainerEl.clientHeight >=
+          logContainerEl.scrollHeight - 20;
+      autoScroll = nearBottom;
+  });
+
+  async function fetchLogs() {
+      try {
+          const res = await fetch(`/jobs/${jobId}/logs/stream`);
+          if (!res.ok) return;
+          const text = await res.text();
+          logContentEl.textContent = text || "(no logs yet...)";
+
+          if (autoScroll) {
+              logContainerEl.scrollTop = logContainerEl.scrollHeight;
+          }
+      } catch (e) {
+          console.error("Error fetching logs", e);
+      }
+  }
+
+  setInterval(fetchLogs, 2000);
+  fetchLogs();
+</script>
+{% endblock %}

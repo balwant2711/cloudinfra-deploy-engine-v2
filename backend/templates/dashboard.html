@@ -1,0 +1,256 @@
+{% extends "base.html" %} {% block header_title %} Dashboard {% endblock %} {%
+block content %}
+<div class="space-y-6">
+  <!-- Top stats cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="card-glow">
+      <div class="text-xs text-slate-400 mb-1">Total Jobs</div>
+      <div class="flex items-end justify-between">
+        <div class="text-2xl font-semibold">{{ jobs|length }}</div>
+        <div class="text-[11px] text-slate-500">
+          Across all templates &amp; custom runs
+        </div>
+      </div>
+    </div>
+
+    <div class="card-glow">
+      <div class="text-xs text-slate-400 mb-1">Successful Deployments</div>
+      {% set successful = jobs|selectattr("status", "equalto", "Success")|list
+      %}
+      <div class="flex items-end justify-between">
+        <div class="text-2xl font-semibold text-emerald-400">
+          {{ successful|length }}
+        </div>
+        <div class="text-[11px] text-slate-500">
+          End-to-end Terraform applies
+        </div>
+      </div>
+    </div>
+
+    <div class="card-glow">
+      <div class="text-xs text-slate-400 mb-1">Running / Queued</div>
+      {% set running = jobs|selectattr("status", "equalto", "Running")|list %}
+      {% set queued = jobs|selectattr("status", "equalto", "Queued")|list %}
+      <div class="flex items-end justify-between">
+        <div class="text-2xl font-semibold text-yellow-300">
+          {{ running|length + queued|length }}
+        </div>
+        <div class="text-[11px] text-slate-500">Live Terraform executions</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions row -->
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h2 class="section-title">Deployments</h2>
+    <div class="flex gap-3">
+      <a
+        href="{{ url_for('deploy_template') }}"
+        class="btn-primary text-xs flex items-center gap-1"
+      >
+        <span>🧩</span>
+        <span>New Template Deployment</span>
+      </a>
+      <a
+        href="{{ url_for('deploy_custom') }}"
+        class="text-xs px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-medium"
+      >
+        📦 Custom Terraform ZIP
+      </a>
+    </div>
+  </div>
+
+  <!-- Jobs Table -->
+  <div class="card-glow">
+    <h3 class="text-sm font-semibold mb-3 text-slate-200">Your Jobs</h3>
+
+    {% if jobs %}
+    <div class="table-container">
+      <table class="w-full text-sm text-left dashboard-table">
+        <thead class="bg-slate-950/80 text-slate-400 text-xs">
+          <tr>
+            <th>Job ID</th>
+            <th>Mode</th>
+            <th>Template</th>
+            <th>Status</th>
+            <th>Main Output</th>
+            <th>Created</th>
+            <th>Finished</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-slate-950/60">
+          {% for job in jobs %}
+          <tr>
+            <td class="text-slate-200">{{ job.id }}</td>
+
+            <td>
+              <span
+                class="px-2 py-0.5 text-[11px] rounded-full bg-slate-800 text-slate-200"
+              >
+                {{ job.mode|capitalize }}
+              </span>
+            </td>
+
+            <td class="text-slate-300 text-xs">
+              {{ job.template_name if job.template_name else "-" }}
+            </td>
+
+            <td>
+              {% if job.status == "Success" %}
+              <span class="badge-success">Success</span>
+              {% elif job.status == "Failed" %}
+              <span class="badge-failed">Failed</span>
+              {% elif job.status == "Running" or job.status == "Queued" %}
+              <span class="badge-running">{{ job.status }}</span>
+              {% elif job.status == "Destroyed" %}
+              <span class="badge-failed">Destroyed</span>
+              {% else %}
+              <span
+                class="px-2 py-0.5 text-[11px] rounded-full bg-slate-700 text-slate-200"
+              >
+                {{ job.status }}
+              </span>
+              {% endif %}
+            </td>
+
+            <td class="text-slate-300 text-xs max-w-[220px]">
+              {% if job.primary_output %}
+              <span class="font-mono break-all">
+                {{ job.primary_output }}
+              </span>
+              {% else %}
+              <span class="text-slate-600">-</span>
+              {% endif %}
+            </td>
+
+            <td class="text-slate-400 text-[11px] whitespace-nowrap">
+              {{ job.created_at.strftime("%Y-%m-%d %H:%M") if job.created_at
+              else "-" }}
+            </td>
+
+            <td class="text-slate-400 text-[11px] whitespace-nowrap">
+              {{ job.finished_at.strftime("%Y-%m-%d %H:%M") if job.finished_at
+              else "-" }}
+            </td>
+
+            <td>
+              <div class="flex flex-wrap gap-2 text-[11px]">
+                {% if job.log_file_path %}
+                <a
+                  href="{{ url_for('view_job_logs', job_id=job.id) }}"
+                  class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700"
+                >
+                  Logs
+                </a>
+                {% endif %} {% if job.outputs_json %}
+                <a
+                  href="{{ url_for('view_job_outputs', job_id=job.id) }}"
+                  class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500"
+                >
+                  Outputs
+                </a>
+                {% endif %} {% if job.status not in ["Destroyed", "Destroy
+                Failed"] %}
+                <button
+                  type="button"
+                  onclick="openDestroyModal('{{ job.id }}')"
+                  class="px-2 py-1 rounded bg-red-600 hover:bg-red-500"
+                >
+                  Destroy
+                </button>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-500">
+      No deployment jobs yet. Start with a
+      <a href="{{ url_for('deploy_template') }}" class="text-sky-400 underline">
+        Template Deployment
+      </a>
+      or
+      <a
+        href="{{ url_for('deploy_custom') }}"
+        class="text-emerald-400 underline"
+      >
+        Custom Terraform ZIP </a
+      >.
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- Destroy Modal -->
+  <div
+    id="destroyModal"
+    class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-slate-900 border border-slate-700 rounded-xl p-5 w-full max-w-md card-glow"
+    >
+      <h2 class="text-lg font-semibold mb-2 text-red-400">Confirm Destroy</h2>
+      <p class="text-sm text-slate-300 mb-4">
+        This will run <code>terraform destroy</code> and delete all
+        infrastructure created by this job. <br /><br />
+        Please enter AWS credentials to continue.
+      </p>
+
+      <form id="destroyForm" method="POST">
+        <input type="hidden" id="destroyJobId" />
+
+        <input
+          name="aws_access_key"
+          type="password"
+          placeholder="AWS Access Key ID"
+          required
+          class="mb-2 w-full"
+        />
+
+        <input
+          name="aws_secret_key"
+          type="password"
+          placeholder="AWS Secret Access Key"
+          required
+          class="mb-3 w-full"
+        />
+
+        <input
+          name="aws_region"
+          type="text"
+          value="ap-south-1"
+          class="mb-3 w-full"
+        />
+
+        <div class="flex justify-between">
+          <button
+            type="button"
+            onclick="closeDestroyModal()"
+            class="px-3 py-1 text-sm bg-slate-700 rounded hover:bg-slate-600"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn-danger text-sm">
+            Confirm Destroy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openDestroyModal(jobId) {
+    const form = document.getElementById("destroyForm");
+    form.action = `/jobs/${jobId}/destroy`;
+    document.getElementById("destroyModal").classList.remove("hidden");
+  }
+
+  function closeDestroyModal() {
+    document.getElementById("destroyModal").classList.add("hidden");
+  }
+</script>
+{% endblock %}
