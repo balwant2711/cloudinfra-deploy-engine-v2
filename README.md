@@ -404,19 +404,19 @@ Open that in your browser.
 ## 📸 UI Previews
 
 ### 📤 Login Page
-![Login](docs/screenshots/login.png)
+![Login](docs/screenshot/login.png)
 
 ### 🏠 Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
+![Dashboard](docs/screenshot/dashboard.png)
 
 ### 📋 Template Deployment
-![Template Mode](docs/screenshots/template.png)
+![Template Mode](docs/screenshot/template.png)
 
 ### 🗂️ Custom ZIP Deployment
-![Custom](docs/screenshots/custom.png)
+![Custom](docs/screenshot/custom.png)
 
 ### 🖥️ Live Logs
-![Logs](docs/screenshots/logs.png)
+![Logs](docs/screenshot/logs.png)
 
 
 Example section:
@@ -452,5 +452,6 @@ See the [LICENSE](LICENSE) file for details.
 
 ::contentReference[oaicite:0]{index=0}
 ```
+
 
 
